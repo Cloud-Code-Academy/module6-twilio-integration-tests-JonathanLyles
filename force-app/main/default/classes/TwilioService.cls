@@ -8,14 +8,15 @@ public with sharing class TwilioService {
     private static final String NAMED_CREDENTIAL = 'TwilioNamedCredential';
     private static String ACCOUNT_SID = '';
     private static String AUTH_TOKEN = '';
-    private static String DEFAULT_FROM_NUMBER = '';
+    private static String DEFAULT_FROM_NUMBER = '+4444444444';
     private static String TWILIO_API_URL = '';
     
     
-    private static TwilioService instance = null;
+    //private static TwilioService instance = null;
     /**
      * Configure Twilio API Settings
      */
+    @testVisible
     public static void configure(){
 
         TwilioApi__c settings = TwilioApi__c.getInstance();
@@ -48,6 +49,8 @@ public with sharing class TwilioService {
             'Body' => messageBody
         };
         
+        System.debug(params);
+
         HttpResponse response = makeHttpRequest('POST', '/Messages.json', params);
         return parseResponse(response);
     }
@@ -142,6 +145,7 @@ public with sharing class TwilioService {
             HttpResponse errorResponse = new HttpResponse();
             errorResponse.setStatusCode(500);
             errorResponse.setBody('{"error": "' + e.getMessage() + '"}');
+            System.debug(errorResponse.getBody());
             return errorResponse;
         }
     }
