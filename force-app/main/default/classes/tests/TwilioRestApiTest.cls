@@ -1,20 +1,15 @@
 /**
  * TwilioRestApiTest - Test class for TwilioRestApi
  * @see TwilioRestApi
- * 
- * TODO: Implement test methods to verify the functionality of the TwilioRestApi class
  */
 @IsTest
 private class TwilioRestApiTest {
     
     /**
      * Test handleIncomingSMS method with standard SMS parameters
-     * 
-     * TODO: Implement this test method to verify handling of standard SMS webhooks
      */
     @IsTest
     static void testHandleIncomingSMSStandard() {
-        // TODO: Setup mock REST request with standard SMS parameters
         // - Create RestRequest and RestResponse objects
         RestRequest request = new RestRequest();
         // - Set requestURI (e.g., '/services/apexrest/twilio/sms')
@@ -29,14 +24,9 @@ private class TwilioRestApiTest {
         request.addParameter('Body','Test message');
 
         RestResponse response = new RestResponse();
-        
-        // TODO: Set the mock request/response objects in RestContext
 
         RestContext.request = request;
         RestContext.response = response;
-        
-        // TODO: Execute the test
-        // - Call TwilioRestApi.handleIncomingSMS()
 
         Test.startTest();
 
@@ -46,7 +36,6 @@ private class TwilioRestApiTest {
 
         System.debug(twilioResponse);
         
-        // TODO: Verify results
         // - Verify response XML is not null
         // - Verify response contains expected TwiML elements
         Assert.areNotEqual(null, twilioResponse, 'Error: twilioResponse was null');
@@ -55,12 +44,9 @@ private class TwilioRestApiTest {
     
     /**
      * Test handleIncomingSMS method with media attachments
-     * 
-     * TODO: Implement this test method to verify handling of SMS with media
      */
     @IsTest
     static void testHandleIncomingSMSWithMedia() {
-        // TODO: Setup mock REST request with media parameters
         // - Create RestRequest and RestResponse objects
         RestRequest request = new RestRequest();
         RestResponse response = new RestResponse();
@@ -79,16 +65,13 @@ private class TwilioRestApiTest {
         request.addParameter('MediaUrl0', 'https://api.twilio.com/2010-04-01/Accounts/AC123/Messages/MM123/Media/MEXXXXX');
         request.addParameter('MediaContentType0', 'image/jpeg');
         
-        // TODO: Set the mock request/response objects in RestContext
         RestContext.request = request;
         RestContext.response = response;
         
-        // TODO: Execute the test
         Test.startTest();
         // - Call TwilioRestApi.handleIncomingSMS()
         String twilioResponse = TwilioRestApi.handleIncomingSMS();
         Test.stopTest();
-        // TODO: Verify results
         // - Verify response XML is not null
         Assert.areNotEqual(null,TwilioResponse,'Error: TwilioResponse is null');
         // - Verify response contains expected TwiML elements
@@ -97,12 +80,9 @@ private class TwilioRestApiTest {
     
     /**
      * Test handleIncomingSMS method with location data
-     * 
-     * TODO: Implement this test method to verify handling of SMS with location data
      */
     @IsTest
     static void testHandleIncomingSMSWithLocation() {
-        // TODO: Setup mock REST request with location parameters
         // - Create RestRequest and RestResponse objects
         RestRequest request = new RestRequest();
         RestResponse response = new RestResponse();
@@ -121,17 +101,15 @@ private class TwilioRestApiTest {
         request.addParameter('FromZip','90210');
         request.addParameter('FromCountry','USA');
         
-        // TODO: Set the mock request/response objects in RestContext
-
         RestContext.request = request;
         RestContext.response = response;
         
-        // TODO: Execute the test
         Test.startTest();
         // - Call TwilioRestApi.handleIncomingSMS()
         String twilioResponse = TwilioRestApi.handleIncomingSMS();
+
         Test.stopTest();
-        // TODO: Verify results
+
         // - Verify response XML is not null
         // - Verify response contains expected TwiML elements
         Assert.areNotEqual(null, twilioResponse, 'Error: twilioResponse was null');
@@ -140,12 +118,10 @@ private class TwilioRestApiTest {
     
     /**
      * Test handleIncomingSMS method with WhatsApp parameters
-     * 
-     * TODO: Implement this test method to verify handling of WhatsApp messages
      */
     @IsTest
     static void testHandleIncomingSMSWithWhatsApp() {
-        // TODO: Setup mock REST request with WhatsApp parameters
+        
         // - Create RestRequest and RestResponse objects
         RestRequest request = new RestRequest();
         RestResponse response = new RestResponse();
@@ -170,15 +146,15 @@ private class TwilioRestApiTest {
         request.addParameter('Address', 'Montreal, QC');
         request.addParameter('Label', 'John\'s Office');
         
-        // TODO: Set the mock request/response objects in RestContext
         RestContext.request = request;
         RestContext.response = response;
         
-        // TODO: Execute the test
         Test.startTest();
         // - Call TwilioRestApi.handleIncomingSMS()
         String twilioResponse = TwilioRestApi.handleIncomingSMS();
-        // TODO: Verify results
+
+        Test.stopTest();
+
         // - Verify response XML is not null
         Assert.areNotEqual(null, twilioResponse, 'Error - twilioResponse is null');
         // - Verify response contains expected TwiML elements

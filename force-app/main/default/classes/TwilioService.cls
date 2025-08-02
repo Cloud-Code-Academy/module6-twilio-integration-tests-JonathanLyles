@@ -4,32 +4,24 @@
  */
 public with sharing class TwilioService {
 
-    // Constants for Twilio API
-    private static final String NAMED_CREDENTIAL = 'TwilioNamedCredential';
+    // Twilio settings
+    private static String NAMED_CREDENTIAL = '';
     private static String ACCOUNT_SID = '';
     private static String AUTH_TOKEN = '';
-    private static String DEFAULT_FROM_NUMBER = '+4444444444';
+    private static String DEFAULT_FROM_NUMBER = '';
     private static String TWILIO_API_URL = '';
-    
-    
-    //private static TwilioService instance = null;
+
     /**
-     * Configure Twilio API Settings
+     * Configure Twilio settings
      */
-    @testVisible
-    public static void configure(){
-
-        TwilioApi__c settings = TwilioApi__c.getInstance();
-        if(settings == null) {
-            return;
-        }
-        TwilioService.ACCOUNT_SID = settings.ACCOUNT_SID__c;
-        TwilioService.AUTH_TOKEN = settings.AUTH_TOKEN__c;
-        TwilioService.DEFAULT_FROM_NUMBER = settings.DEFAULT_FROM_NUMBER__c;
-        TwilioService.TWILIO_API_URL = settings.TWILIO_API_URL__c;
+    private static void configure(){
+        Twilio_Setting__mdt settings = [SELECT Account_SID__c, Auth_Token__c, Default_From_Number__c, Named_Credential__c, Twilio_Api_Url__c  FROM Twilio_Setting__mdt WHERE MasterLabel = 'Active' LIMIT 1];
+        NAMED_CREDENTIAL = settings.Named_Credential__c;
+        ACCOUNT_SID = settings.Account_SID__c;
+        AUTH_TOKEN = settings.Auth_Token__c;
+        DEFAULT_FROM_NUMBER = settings.Default_From_Number__c;
+        TWILIO_API_URL = settings.Twilio_Api_Url__c;
     }
-
-    
     
     /**
      * Send an SMS message via Twilio
@@ -49,8 +41,6 @@ public with sharing class TwilioService {
             'Body' => messageBody
         };
         
-        System.debug(params);
-
         HttpResponse response = makeHttpRequest('POST', '/Messages.json', params);
         return parseResponse(response);
     }
@@ -87,16 +77,6 @@ public with sharing class TwilioService {
         HttpRequest request = new HttpRequest();
         request.setEndpoint('callout:' + NAMED_CREDENTIAL + '/' + TWILIO_API_URL + endpoint);
         request.setMethod(method);
-        
-        //Add Basic Auth header for Twilio authentication
-        //Twilio uses HTTP Basic Auth with Account SID as username and Auth Token as password
-
-        // String authString = ACCOUNT_SID + ':' + AUTH_TOKEN;
-        // Blob headerValue = Blob.valueOf(authString);
-        // String authorizationHeader = 'Basic ' + EncodingUtil.base64Encode(headerValue);
-        // request.setHeader('Authorization', authorizationHeader);
-        
-        // Set timeout to avoid long-running callouts
         request.setTimeout(20000); // 20 seconds timeout
         
         // Add parameters to request
@@ -125,8 +105,6 @@ public with sharing class TwilioService {
             request.setBody(requestBody);
         }
 
-   
-        
         try {
             System.debug('Sending request to: ' + request.getEndpoint());
             System.debug('With method: ' + method);
@@ -154,6 +132,7 @@ public with sharing class TwilioService {
      * Parse HTTP response from Twilio
      */
     private static TwilioResponse parseResponse(HttpResponse response) {
+        
         TwilioResponse twilioResponse = new TwilioResponse();
         twilioResponse.statusCode = response.getStatusCode();
         twilioResponse.body = response.getBody();
