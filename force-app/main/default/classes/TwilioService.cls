@@ -3,13 +3,26 @@
  * Handles sending and retrieving SMS messages via Twilio API
  */
 public with sharing class TwilioService {
-    // Constants for Twilio API
-    private static final String ACCOUNT_SID = ''; // TODO: Add your Twilio Account SID
-    private static final String AUTH_TOKEN = ''; // TODO: Add your Twilio Auth Token
-    private static final String DEFAULT_FROM_NUMBER = ''; // TODO: Add your default sender number
-    private static final String TWILIO_API_URL = 'https://api.twilio.com/2010-04-01/Accounts/' + ACCOUNT_SID;
 
+    // Twilio settings
+    private static String NAMED_CREDENTIAL = '';
+    private static String ACCOUNT_SID = '';
+    private static String AUTH_TOKEN = '';
+    private static String DEFAULT_FROM_NUMBER = '';
+    private static String TWILIO_API_URL = '';
 
+    /**
+     * Configure Twilio settings
+     */
+    private static void configure(){
+        Twilio_Setting__mdt settings = [SELECT Account_SID__c, Auth_Token__c, Default_From_Number__c, Named_Credential__c, Twilio_Api_Url__c  FROM Twilio_Setting__mdt WHERE MasterLabel = 'Active' LIMIT 1];
+        NAMED_CREDENTIAL = settings.Named_Credential__c;
+        ACCOUNT_SID = settings.Account_SID__c;
+        AUTH_TOKEN = settings.Auth_Token__c;
+        DEFAULT_FROM_NUMBER = settings.Default_From_Number__c;
+        TWILIO_API_URL = settings.Twilio_Api_Url__c;
+    }
+    
     /**
      * Send an SMS message via Twilio
      * @param toNumber - Recipient phone number (E.164 format)
@@ -18,6 +31,8 @@ public with sharing class TwilioService {
      * @return TwilioResponse containing status and message details
      */
     public static TwilioResponse sendSMS(String toNumber, String messageBody) {
+
+        configure();
         
         // Prepare request parameters
         Map<String, String> params = new Map<String, String> {
@@ -36,6 +51,9 @@ public with sharing class TwilioService {
      * @return TwilioResponse containing status and list of messages
      */
     public static TwilioResponse getMessages(Integer pageLimit) {
+
+        configure();
+
         if (pageLimit == null || pageLimit <= 0) {
             pageLimit = 20;
         }
@@ -52,19 +70,13 @@ public with sharing class TwilioService {
      * Common method to make HTTP requests to Twilio API
      */
     private static HttpResponse makeHttpRequest(String method, String endpoint, Map<String, String> params) {
+
+        configure();
+
         Http http = new Http();
         HttpRequest request = new HttpRequest();
-        request.setEndpoint(TWILIO_API_URL + endpoint);
+        request.setEndpoint('callout:' + NAMED_CREDENTIAL + '/' + TWILIO_API_URL + endpoint);
         request.setMethod(method);
-        
-        // Add Basic Auth header for Twilio authentication
-        // Twilio uses HTTP Basic Auth with Account SID as username and Auth Token as password
-        String authString = ACCOUNT_SID + ':' + AUTH_TOKEN;
-        Blob headerValue = Blob.valueOf(authString);
-        String authorizationHeader = 'Basic ' + EncodingUtil.base64Encode(headerValue);
-        request.setHeader('Authorization', authorizationHeader);
-        
-        // Set timeout to avoid long-running callouts
         request.setTimeout(20000); // 20 seconds timeout
         
         // Add parameters to request
@@ -92,7 +104,7 @@ public with sharing class TwilioService {
             }
             request.setBody(requestBody);
         }
-        
+
         try {
             System.debug('Sending request to: ' + request.getEndpoint());
             System.debug('With method: ' + method);
@@ -111,6 +123,7 @@ public with sharing class TwilioService {
             HttpResponse errorResponse = new HttpResponse();
             errorResponse.setStatusCode(500);
             errorResponse.setBody('{"error": "' + e.getMessage() + '"}');
+            System.debug(errorResponse.getBody());
             return errorResponse;
         }
     }
@@ -119,6 +132,7 @@ public with sharing class TwilioService {
      * Parse HTTP response from Twilio
      */
     private static TwilioResponse parseResponse(HttpResponse response) {
+        
         TwilioResponse twilioResponse = new TwilioResponse();
         twilioResponse.statusCode = response.getStatusCode();
         twilioResponse.body = response.getBody();
@@ -126,4 +140,4 @@ public with sharing class TwilioService {
         
         return twilioResponse;
     }
-} 
+}
